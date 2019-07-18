@@ -1,0 +1,44 @@
+#vgy-file-upload {
+
+	display: none;
+
+}
+
+.vgy-upload-button {
+
+	margin-left: 10px !important;
+
+}
+
+.vgy-quick-reply-button img {
+
+	vertical-align:  middle;
+	margin-left: 5px;
+
+}
+
+.vgy-upload-uploading {
+
+	animation-name: vgy-uploading;
+	animation-duration: 1s;
+	animation-fill-mode: forwards;
+	animation-iteration-count: infinite;
+	animation-timing-function: linear;
+
+}
+
+@keyframes vgy-uploading {
+
+	from {
+
+		transform: rotate(0deg);
+
+	}
+
+	to {
+
+		transform: rotate(360deg);
+
+	}
+
+}
