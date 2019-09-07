@@ -22,6 +22,8 @@ var Vgy_Image_Upload = function () {
 			this.upload_url = "https://vgy.me/upload";
 			this.file_upload_elem = null;
 
+			this.user_key = localStorage.getItem("vgy_user_key");
+
 			this.setup();
 
 			$(this.ready.bind(this));
@@ -46,6 +48,8 @@ var Vgy_Image_Upload = function () {
 	}, {
 		key: "create_button",
 		value: function create_button() {
+			var _this2 = this;
+
 			var $elem = null;
 			var $controls = null;
 			var $ul = null;
@@ -65,7 +69,14 @@ var Vgy_Image_Upload = function () {
 			$elem.attr("title", "Upload Image");
 			$elem.addClass("vgy-upload-button button");
 
-			$elem.on("click", this.display_file_browser.bind(this));
+			$elem.on("click", function () {
+
+				if (_this2.user_key) {
+					_this2.display_file_browser.bind(_this2)();
+				} else {
+					_this2.display_user_key_dialog();
+				}
+			});
 
 			if ($controls && $ul) {
 				$ul.append($elem);
@@ -87,7 +98,7 @@ var Vgy_Image_Upload = function () {
 	}, {
 		key: "upload_file",
 		value: function upload_file() {
-			var _this2 = this;
+			var _this3 = this;
 
 			if (!this.file_upload_elem) {
 				return;
@@ -102,6 +113,7 @@ var Vgy_Image_Upload = function () {
 			var data = new FormData();
 
 			data.append("file", file);
+			data.append("userkey", this.user_key);
 
 			$(".vgy-upload-image-button").addClass("vgy-upload-uploading");
 
@@ -115,7 +127,7 @@ var Vgy_Image_Upload = function () {
 				return response.json();
 			}).then(function (response) {
 
-				_this2.insert_image(response.image);
+				_this3.insert_image(response.image);
 				$(".vgy-upload-image-button").removeClass("vgy-upload-uploading");
 			});
 		}
@@ -139,6 +151,49 @@ var Vgy_Image_Upload = function () {
 			if (content) {
 				content.replaceSelection(replacement);
 			}
+		}
+	}, {
+		key: "display_user_key_dialog",
+		value: function display_user_key_dialog() {
+			var _this4 = this;
+
+			var $container = $("<div class='vgy-user-key-dialog-content'></div>");
+			var content = "";
+
+			content += "The free image upload service <a href='https://vgy.me/'>vgy.me</a> now requires you to create";
+			content += " an account to be able to upload images.<br /><br />To be able";
+			content += " to also upload directly from this forum, you need to create a user key.<br /><br />";
+			content += "Here is a <a href='https://www.youtube.com/watch?v=fPKfJtoLSnI'>quick video</a> on how to create a user key.<br /><br />";
+			content += "<strong>Note: The key is stored locally for the browser being used.<br /><br />";
+			content += "User Key: <input id='vgy-user-key-field' type='text' /> <button>Save Key</button>";
+
+			$container.html(content);
+
+			$container.find("button").on("click", function () {
+
+				var key = $("#vgy-user-key-field").val();
+
+				if (key && key.length > 5) {
+					localStorage.setItem("vgy_user_key", key);
+
+					_this4.user_key = key;
+
+					$("#vgy_user_key_dialog").dialog("close");
+					_this4.display_file_browser();
+				}
+			});
+
+			pb.window.dialog("vgy_user_key_dialog", {
+
+				title: "User Key For Vgy.me",
+				width: 600,
+				height: 260,
+				html: $container,
+				modal: true,
+				draggable: true,
+				resizable: true
+
+			});
 		}
 	}, {
 		key: "setup",
